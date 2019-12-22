@@ -24,13 +24,11 @@ def get_product_list(categiry):
 
 headers = {
     'User-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 YaBrowser/19.12.2.252 Yowser/2.5 Safari/537.36'}
-params = {'categories': '', 'page': 1}
 
 url = 'https://5ka.ru/api/v2/special_offers/'
 url_category = 'https://5ka.ru/api/v2/categories/'
 
-product_category = {'category_id': '',
-                    'category_name': ''}
+product_category = {'category_id': '', 'category_name': ''}
 product_category_list = []
 
 response_cat = requests.get(url_category, headers=headers)
