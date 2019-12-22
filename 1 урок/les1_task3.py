@@ -17,7 +17,8 @@ def get_product_list(categiry):
     new_url = url + f'?page=1&categories={categiry}'
     while new_url:
         response = get_data(new_url, headers)
-        results.extend(response['results'])
+        for item in response['results']:
+            results.append(item['name'])
         new_url = response['next']
     return results
 
