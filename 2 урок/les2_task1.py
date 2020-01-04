@@ -35,7 +35,6 @@ def url_on_page(url: str) -> tuple:
 
 
 def post_scraping(post_link: str):
-    counter = 1
     req = requests.get(post_link)
     soup = BS(req.text, 'lxml')
     post_title = soup.h1.text.strip()
