@@ -66,12 +66,12 @@ def get_all_vacancy_from_page(html: str) -> list:
 
     def get_vacancy_location(bs_obj: BS) -> str:
         """Возвращает местоположение работодателя"""
-        pass
+        return bs_obj.find('span', attrs={'data-qa': 'vacancy-serp__vacancy-address'}).text
 
     vacancy_title_list = []
     for vacancy in vacancy_html_list(html):
         print(get_vacancy_title(vacancy), get_vacancy_link(vacancy), get_vacancy_salary(vacancy),
-              get_vacancy_employer(vacancy))
+              get_vacancy_employer(vacancy), get_vacancy_location(vacancy))
     return vacancy_html_list(html)
 
 
