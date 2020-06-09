@@ -49,15 +49,20 @@ def get_all_vacancy_from_page(html: str) -> list:
 
     def get_vacancy_link(bs_obj: BS) -> str:
         """Возвращает список из html-блоков с вакансиями"""
-        pass
+        return bs_obj.find('a', attrs={'data-qa': 'vacancy-serp__vacancy-title'})['href'].split('?')[0]
 
     def get_vacancy_salary(bs_obj: BS) -> str:
         """Возвращает список из html-блоков с вакансиями"""
-        pass
+        salary = None
+        try:
+            salary = bs_obj.find('span', attrs={'data-qa': 'vacancy-serp__vacancy-compensation'}).text
+        except AttributeError:
+            pass
+        return salary
 
     def get_vacancy_employer(bs_obj: BS) -> str:
         """Возвращает наименование работодателя"""
-        pass
+        return bs_obj.find('a', attrs={'data-qa': 'vacancy-serp__vacancy-employer'}).text
 
     def get_vacancy_location(bs_obj: BS) -> str:
         """Возвращает местоположение работодателя"""
@@ -65,7 +70,8 @@ def get_all_vacancy_from_page(html: str) -> list:
 
     vacancy_title_list = []
     for vacancy in vacancy_html_list(html):
-        print(get_vacancy_title(vacancy))
+        print(get_vacancy_title(vacancy), get_vacancy_link(vacancy), get_vacancy_salary(vacancy),
+              get_vacancy_employer(vacancy))
     return vacancy_html_list(html)
 
 
