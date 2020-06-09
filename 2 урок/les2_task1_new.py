@@ -72,7 +72,7 @@ def get_all_vacancy_from_page(html: str) -> list:
     for vacancy in vacancy_html_list(html):
         print(get_vacancy_title(vacancy), get_vacancy_link(vacancy), get_vacancy_salary(vacancy),
               get_vacancy_employer(vacancy), get_vacancy_location(vacancy))
-    return vacancy_html_list(html)
+    return vacancy_html_list(html)[0].prettify()
 
 
 def get_next_page_link(html: str) -> str:
