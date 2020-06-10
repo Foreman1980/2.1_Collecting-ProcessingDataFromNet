@@ -2601,3 +2601,4 @@
 /venv/Scripts/activate.bat
 /venv/Scripts/deactivate.bat
 *.epub
+*.xls
