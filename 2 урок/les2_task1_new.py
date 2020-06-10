@@ -6,9 +6,12 @@ import time
 
 main_link = 'https://murmansk.hh.ru'
 
+vacancy_info_dict = {'vacancy_title': [None], 'vacancy_link': [None], 'salary_min': [None], 'salary_max': [None],
+                     'currency': [None], 'employer': [None], 'location': [None],
+                     }
 
 def main():
-    number_of_pages = 1
+    number_of_pages = 5
     vacancy = 'Data analyst'
     # vacancy = input('Введите наименование вакансии: ')
 
@@ -23,20 +26,22 @@ def main():
     link = main_link + '/search/vacancy'
     current_page_number = 0
 
-    vacancy_info_dict = {'vacancy_name': [None], 'vacancy_link': [None], 'salary_min': [None], 'salary_max': [None],
-                         'currency': [None], 'employer': [None], 'location': [None]}
-
     result_df = pd.DataFrame(data=vacancy_info_dict)
 
     while (current_page_number < number_of_pages) and link != 'page not found':
         current_page_number += 1
-        page_html = requests.get(link, params=params, headers=headers).text
-        # result_df = pd.concat([result_df, get_all_vacancy_from_page(page_html)], axis=0, ignore_index=True)
+        while True:
+            page = requests.get(link, params=params, headers=headers)
+            time.sleep(0.5)
+            if page.status_code == 200:
+                break
+        page_html = page.text
+        result_df = pd.concat([result_df, get_all_vacancy_from_page(page_html)], axis=0, ignore_index=True)
         print(get_all_vacancy_from_page(page_html))
         link = get_next_page_link(page_html)
         params = {}
-        print(current_page_number + 1, ' - ', link)
-        time.sleep(0.5)
+    result_df.to_excel('data.xls')
+
 
 
 def get_all_vacancy_from_page(html: str) -> list:
@@ -89,21 +94,25 @@ def get_all_vacancy_from_page(html: str) -> list:
 
     def get_vacancy_employer(bs_obj: BS) -> str:
         """Возвращает наименование работодателя"""
-        return bs_obj.find('a', attrs={'data-qa': 'vacancy-serp__vacancy-employer'}).text
+        return bs_obj.find('a', attrs={'data-qa': 'vacancy-serp__vacancy-employer'}).text.strip()
 
     def get_vacancy_location(bs_obj: BS) -> str:
         """Возвращает местоположение работодателя"""
         return bs_obj.find('span', attrs={'data-qa': 'vacancy-serp__vacancy-address'}).text
 
+    df = pd.DataFrame(data=vacancy_info_dict)
     for vacancy in vacancy_html_list(html):
-        vacancy_title = get_vacancy_title(vacancy)
-        vacancy_link = get_vacancy_link(vacancy)
-        vacancy_salary_dict = get_vacancy_salary(vacancy)
-        vacancy_employer = get_vacancy_employer(vacancy)
-        vacancy_location = get_vacancy_location(vacancy)
-        print(vacancy_title, vacancy_link, vacancy_salary_dict, vacancy_employer, vacancy_location)
-    return 'next_page'
-
+        next_vacancy_info_dict = {}
+        next_vacancy_info_dict['vacancy_title'] = get_vacancy_title(vacancy)
+        next_vacancy_info_dict['vacancy_link'] = get_vacancy_link(vacancy)
+        salary_dict = get_vacancy_salary(vacancy)
+        next_vacancy_info_dict['salary_min'] = salary_dict['salary_min']
+        next_vacancy_info_dict['salary_max'] = salary_dict['salary_max']
+        next_vacancy_info_dict['currency'] = salary_dict['currency']
+        next_vacancy_info_dict['employer'] = get_vacancy_employer(vacancy)
+        next_vacancy_info_dict['location'] = get_vacancy_location(vacancy)
+        df = df.append(next_vacancy_info_dict, ignore_index=True)
+    return df
 
 def get_next_page_link(html: str) -> str:
     """Возвращает ссылку на следующую страницу результатов поиска"""
