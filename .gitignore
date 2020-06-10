@@ -2600,3 +2600,4 @@
 /venv/Scripts/activate
 /venv/Scripts/activate.bat
 /venv/Scripts/deactivate.bat
+*.epub
