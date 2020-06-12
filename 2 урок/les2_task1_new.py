@@ -6,8 +6,8 @@ import time
 
 main_link = 'https://murmansk.hh.ru'
 
-vacancy_info_dict = {'vacancy_title': [None], 'vacancy_link': [None], 'salary_min': [None], 'salary_max': [None],
-                     'currency': [None], 'employer': [None], 'location': [None],
+vacancy_info_dict = {'vacancy_title': None, 'vacancy_link': None, 'salary_min': None, 'salary_max': None,
+                     'currency': None, 'employer': None, 'location': None,
                      }
 
 def main():
@@ -26,7 +26,7 @@ def main():
     link = main_link + '/search/vacancy'
     current_page_number = 0
 
-    result_df = pd.DataFrame(data=vacancy_info_dict)
+    result_df = pd.DataFrame(data=vacancy_info_dict, index=[0])
 
     while (current_page_number < number_of_pages) and link != 'page not found':
         current_page_number += 1
@@ -40,8 +40,8 @@ def main():
         print(get_all_vacancy_from_page(page_html))
         link = get_next_page_link(page_html)
         params = {}
+    result_df = result_df.drop([0, 1], axis=0).reset_index(drop=True)
     result_df.to_excel('data.xls')
-
 
 
 def get_all_vacancy_from_page(html: str) -> list:
@@ -100,9 +100,9 @@ def get_all_vacancy_from_page(html: str) -> list:
         """Возвращает местоположение работодателя"""
         return bs_obj.find('span', attrs={'data-qa': 'vacancy-serp__vacancy-address'}).text
 
-    df = pd.DataFrame(data=vacancy_info_dict)
+    df = pd.DataFrame(data=vacancy_info_dict, index=[0])
     for vacancy in vacancy_html_list(html):
-        next_vacancy_info_dict = {}
+        next_vacancy_info_dict = vacancy_info_dict
         next_vacancy_info_dict['vacancy_title'] = get_vacancy_title(vacancy)
         next_vacancy_info_dict['vacancy_link'] = get_vacancy_link(vacancy)
         salary_dict = get_vacancy_salary(vacancy)
