@@ -5,9 +5,6 @@ client = MongoClient('localhost', 27017)
 db = client['vacancies_db']
 vacancies = db.vacancies
 
-# input_salary = int(input('Введите желаемую зарплату (руб.) - '))
-input_salary = 100000
-
 
 def vacancies_search(salary: int):
     for vacancy in vacancies.find({'$or': [{'salary.currency': {'$eq': 'руб.'},
@@ -26,4 +23,6 @@ def pars_ruble_exchange_rate() -> float:
 
 
 if __name__ == '__main__':
+    # input_salary = int(input('Введите желаемую зарплату (руб.) - '))
+    input_salary = 100000
     vacancies_search(input_salary)

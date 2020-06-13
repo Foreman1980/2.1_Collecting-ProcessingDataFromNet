@@ -10,12 +10,6 @@ client = MongoClient('localhost', 27017)
 db = client['vacancies_db']
 vacancies = db.vacancies
 
-number_of_pages = 5
-input_vacancy = 'Data analyst'
-
-
-# input_vacancy = input('Введите наименование вакансии: ')
-
 
 def pars_vacancies_into_db(vacancy: str):
     """Парсинг и сохранение данных о вакансиях в БД"""
@@ -141,4 +135,8 @@ def delete_old_records():
 
 
 if __name__ == '__main__':
+    number_of_pages = 5
+    input_vacancy = 'Data analyst'
+
+    # input_vacancy = input('Введите наименование вакансии: ')
     pars_vacancies_into_db(input_vacancy)
