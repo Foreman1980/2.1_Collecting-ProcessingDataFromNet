@@ -20,9 +20,11 @@ news = db.news
 
 def pars_news_mail():
     def get_all_news_links_on_start_page(page_html: str) -> list:
+        # //ul[@class='list list_type_square list_half js-module']/li
         dom = html.fromstring(page_html)
         blocks = dom.xpath("//a[@class='photo photo_full photo_scale js-topnews__item'] | \
         //a[@class='photo photo_small photo_scale photo_full js-topnews__item'] | \
+        //ul[@class='list list_type_square list_half js-module']/li[not(contains(@class, 'hidden_medium hidden_large'))] | \
         //a[@class='newsitem__title link-holder'] | \
         //a[@class='link link_flex']")
         links_on_start_page = []
@@ -36,7 +38,7 @@ def pars_news_mail():
         response = requests.get(news_link, headers=headers)
         news_dom = html.fromstring(response.text)
         news_dict['news_headline'] = news_dom.xpath("//h1[@class='hdr__inner']/text()")[0]
-        news_dict['source_name'] = 'MAIL.RU'
+        news_dict['source_name'] = news_dom.xpath("//a[@class='link color_gray breadcrumbs__link']/span/text()")[0]
         news_date = news_dom.xpath("//span[@class='note__text breadcrumbs__text js-ago']/@datetime")[0]
         news_dict['news_date'] = datetime.strptime(news_date.split('+')[0], '%Y-%m-%dT%H:%M:%S').strftime('%d.%m.%Y')
         news_dict['news_link'] = news_link
