@@ -20,17 +20,16 @@ news = db.news
 
 def pars_news_mail():
     def get_all_news_links_on_start_page(page_html: str) -> list:
-        # //ul[@class='list list_type_square list_half js-module']/li
         dom = html.fromstring(page_html)
         blocks = dom.xpath("//a[@class='photo photo_full photo_scale js-topnews__item'] | \
         //a[@class='photo photo_small photo_scale photo_full js-topnews__item'] | \
         //ul[@class='list list_type_square list_half js-module']/li[not(contains(@class, 'hidden_medium hidden_large'))] | \
-        //a[@class='newsitem__title link-holder'] | \
-        //a[@class='link link_flex']")
+        //a[@class='newsitem__title link-holder'] | //a[@class='link link_flex']")
         links_on_start_page = []
         for block in blocks:
             link = block.xpath('.//@href')
-            links_on_start_page += link
+            if len(link[0].split('/')) == 4:
+                links_on_start_page += link
         return links_on_start_page
 
     def get_news_data(news_link: str) -> dict:
@@ -39,8 +38,8 @@ def pars_news_mail():
         news_dom = html.fromstring(response.text)
         news_dict['news_headline'] = news_dom.xpath("//h1[@class='hdr__inner']/text()")[0]
         news_dict['source_name'] = news_dom.xpath("//a[@class='link color_gray breadcrumbs__link']/span/text()")[0]
-        news_date = news_dom.xpath("//span[@class='note__text breadcrumbs__text js-ago']/@datetime")[0]
-        news_dict['news_date'] = datetime.strptime(news_date.split('+')[0], '%Y-%m-%dT%H:%M:%S').strftime('%d.%m.%Y')
+        news_dict['news_date'] = convert_news_date(
+            news_dom.xpath("//span[@class='note__text breadcrumbs__text js-ago']/@datetime")[0])
         news_dict['news_link'] = news_link
         return news_dict
 
@@ -54,11 +53,43 @@ def pars_news_mail():
 
 
 def pars_news_lenta():
-    pass
+    def get_all_news_links_on_start_page(page_html: str) -> list:
+        dom = html.fromstring(page_html)
+        blocks = dom.xpath("//div[contains(@class, 'item')]//a[contains(@href, 'news')]")
+        links_on_start_page = []
+        for block in blocks:
+            link = block.xpath('.//@href')
+            if link[0].startswith('/news/'):
+                links_on_start_page += link
+        return links_on_start_page
+
+    def get_news_data(news_link: str) -> dict:
+        news_dict = {}
+        response_news_page = requests.get(news_link, headers=headers)
+        news_dom = html.fromstring(response_news_page.text)
+        news_dict['news_headline'] = news_dom.xpath("//h1[contains(@class, 'b-topic__title')]/text()")[0].replace(
+            '\xa0', ' ')
+        news_dict['source_name'] = 'Lenta.RU'
+        news_dict['news_date'] = convert_news_date(
+            news_dom.xpath("//div[contains(@class, 'b-topic__info')]//@datetime")[0])
+        news_dict['news_link'] = news_link
+        return news_dict
+
+    response = requests.get(news_link_lenta, headers=headers)
+    news_links = get_all_news_links_on_start_page(response.text)
+    for link in news_links:
+        news_data_dict = get_news_data(news_link_lenta + link)
+        time.sleep(1)
+        news.update_one({'news_link': news_data_dict['news_link']}, {'$set': news_data_dict}, upsert=True)
+        pprint(news_data_dict)
 
 
 def pars_news_yandex():
     pass
+
+
+def convert_news_date(date: str) -> str:
+    return datetime.strptime(date.split('+')[0], '%Y-%m-%dT%H:%M:%S').strftime('%d.%m.%Y')
 
 
 if __name__ == '__main__':
