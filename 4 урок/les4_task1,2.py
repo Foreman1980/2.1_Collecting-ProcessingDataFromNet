@@ -2,7 +2,7 @@ import requests
 from lxml import html
 from pymongo import MongoClient
 from pprint import pprint
-from datetime import datetime
+from datetime import datetime, date
 import time
 
 news_link_mail = 'https://news.mail.ru'
@@ -41,6 +41,7 @@ def pars_news_mail():
         news_dict['news_date'] = convert_news_date(
             news_dom.xpath("//span[@class='note__text breadcrumbs__text js-ago']/@datetime")[0])
         news_dict['news_link'] = news_link
+        news_dict['updated_date'] = date.today().strftime('%d.%m.%Y')
         return news_dict
 
     response = requests.get(news_link_mail, headers=headers)
@@ -73,6 +74,7 @@ def pars_news_lenta():
         news_dict['news_date'] = convert_news_date(
             news_dom.xpath("//div[contains(@class, 'b-topic__info')]//@datetime")[0])
         news_dict['news_link'] = news_link
+        news_dict['updated_date'] = date.today().strftime('%d.%m.%Y')
         return news_dict
 
     response = requests.get(news_link_lenta, headers=headers)
@@ -92,7 +94,15 @@ def convert_news_date(date: str) -> str:
     return datetime.strptime(date.split('+')[0], '%Y-%m-%dT%H:%M:%S').strftime('%d.%m.%Y')
 
 
+def delete_old_news():
+    """Перед окончанием работы программы, проверка и удаление закрытых на сайте вакансий"""
+
+    result = news.delete_many({'updated_date': {'$ne': date.today().strftime('%d.%m.%Y')}})
+    print(f'Удалено {result.deleted_count} устаревших записей.')
+
+
 if __name__ == '__main__':
     pars_news_mail()
     pars_news_lenta()
     pars_news_yandex()
+    delete_old_news()
