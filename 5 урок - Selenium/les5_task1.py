@@ -26,14 +26,13 @@ letter_id = driver.find_element_by_class_name('thread__letter_expanded').get_att
 count = 1
 
 while True:
-    print(count, letter_id)
-
     element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'button2_arrow-down')))
     try:
         element.click()
     except ElementClickInterceptedException:
         break
     else:
+        print(count, letter_id)
         time.sleep(0.5)
         count += 1
         letter_id = driver.find_element_by_class_name('thread__letter_expanded').get_attribute('data-id')
