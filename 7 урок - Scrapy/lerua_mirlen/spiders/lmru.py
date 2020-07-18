@@ -1,10 +1,6 @@
 import scrapy
 from scrapy.http import HtmlResponse
 
-import sys
-
-sys.path.insert(0,
-                r"D:\Бизнес\15 Data-scientist (Phyton)\Занятия\GeekBrains\2.1_Collecting&ProcessingDataFromNet\6 урок - Scrapy")
 
 from lerua_mirlen.items import LeruaMirlenItem
 from scrapy.loader import ItemLoader
@@ -16,7 +12,8 @@ class LmruSpider(scrapy.Spider):
     allowed_domains = ['leroymerlin.ru']
     # start_urls = ['https://leroymerlin.ru/catalogue/dreli-shurupoverty/']
     # start_urls = ['https://leroymerlin.ru/catalogue/ushm-bolgarki/']
-    start_urls = ['https://leroymerlin.ru/catalogue/teploizolyaciya/']
+    # start_urls = ['https://leroymerlin.ru/catalogue/teploizolyaciya/']
+    start_urls = ['https://leroymerlin.ru/catalogue/vagonka/']
 
     # def __init__(self):
     #     self.start_urls = [f'https://leroymerlin.ru/catalogue/{request[0]}/']

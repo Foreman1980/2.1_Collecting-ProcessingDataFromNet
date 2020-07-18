@@ -7,8 +7,9 @@ import scrapy
 from scrapy.loader.processors import MapCompose, TakeFirst, Join
 
 
-def price_processing(product_price: str) -> int:
-    return int(product_price.replace(' ', '').split('.')[0])
+def price_processing(product_price: str) -> float:
+    price = product_price.replace(' ', '').split('.')
+    return int(price[0]) + int(price[1])/100
 
 
 def name_processing(product_name: str) -> str:
