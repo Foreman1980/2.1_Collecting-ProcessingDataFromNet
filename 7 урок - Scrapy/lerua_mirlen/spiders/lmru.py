@@ -1,7 +1,6 @@
 import scrapy
 from scrapy.http import HtmlResponse
 
-
 from lerua_mirlen.items import LeruaMirlenItem
 from scrapy.loader import ItemLoader
 import time

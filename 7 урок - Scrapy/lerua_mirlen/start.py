@@ -1,11 +1,6 @@
 from scrapy.crawler import CrawlerProcess
 from scrapy.settings import Settings
 
-import sys
-
-sys.path.insert(0,
-                r"D:\Бизнес\15 Data-scientist (Phyton)\Занятия\GeekBrains\2.1_Collecting&ProcessingDataFromNet\7 урок - Scrapy")
-
 from lerua_mirlen import settings
 from lerua_mirlen.spiders.lmru import LmruSpider
 
