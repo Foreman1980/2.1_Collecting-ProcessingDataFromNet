@@ -18,10 +18,10 @@ class LeruaMirlenDataBasePipeline:
 
     def process_item(self, item, spider):
         category = item['category'].split('/')[-1]
-        collection = self.mongo_base[category]
+        collection = self.mongo_base[category]  # Создаём коллекцию по имени категории
         for i in range(len(item['specifications'])):
-            item['specifications'][i] = f'{i + 1} {item["specifications"][i]}'
-        spec_dict = dict(zip(item['specifications'], item['value']))
+            item['specifications'][i] = f'{i + 1} {item["specifications"][i]}' # Добавляем нумерацию по порядку
+        spec_dict = dict(zip(item['specifications'], item['value']))  # Создаём словарь характеристик товара
         item['specifications'] = spec_dict
         del item['value']
         collection.insert_one(item)
